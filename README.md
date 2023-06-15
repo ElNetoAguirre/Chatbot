@@ -13,7 +13,7 @@
 
 # Chatbot Básico usando Python + ChatGPT
 
-El programa, basado en terminal, es capaz de responder tus preguntas y de ésta manera podrá mantener una conversación.
+El programa, basado en terminal, es capaz de responder tus preguntas y de ésta manera podrá mantener una conversación. Así mismo, puede determinar matemáticamente si la respuesta a tus preguntas es relevante o no para la conversación.
 
 El código cuenta con una sección para agregar una **"lista negra"** de palabras a censurar, si alguna palabra de las que estén en la lista es usada por el ChatBot, será sustituida por **`"[XXXXX]"`** para indicar que dicha palabra ha sido censurada.
 

@@ -6,6 +6,7 @@ Chatbot Básico usando Python + ChatGPT
 import os
 import openai
 import spacy
+import numpy as np
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,6 +19,23 @@ respuestas_anteriores = []
 modelo_spacy = spacy.load("es_core_news_md")
 # La siguiente linea es la lista negra de palabras a censurar, modificar a conveniencia
 palabras_prohibidas = ["palabra1", "palabra2"]
+
+# Función para la Similitud de los Vectores
+def similitud_coseno(vec1, vec2):
+    """Función para la Similitud de los vectores"""
+    superposicion = np.dot(vec1, vec2)
+    magnitud1 = np.linalg.norm(vec1)
+    magnitud2 = np.linalg.norm(vec2)
+    sim_cos = superposicion / (magnitud1 * magnitud2)
+    return sim_cos
+
+# Cálculo entre dos valores de texto
+def es_relevante(respuesta, entrada, umbral=0.25):
+    """Cálculo entre dos valores de texto"""
+    entrada_vectorizada = modelo_spacy(entrada).vector
+    respuesta_vectorizada = modelo_spacy(respuesta).vector
+    similitud = similitud_coseno(entrada_vectorizada, respuesta_vectorizada)
+    return similitud >= umbral
 
 # Función para filtrar lista negra de palabras
 def filtrar_lista_negra(texto, lista__negra):
@@ -67,9 +85,15 @@ while True:
     prompt = f"El usuario pregunta: {ingreso_usuario}\n:"
     CONVERSACION_HISTORICA += prompt
     RESPUESTA_GPT = preguntar_chat_gpt(CONVERSACION_HISTORICA)
-    print("\n")
-    print(f"Chatbox: {RESPUESTA_GPT}")
 
-    # Almacenar las conversaciones
-    preguntas_anteriores.append(ingreso_usuario)
-    respuestas_anteriores.append(RESPUESTA_GPT)
+    relevante = es_relevante(RESPUESTA_GPT, ingreso_usuario)
+
+    if relevante:
+        print("\n")
+        print(f"Chatbox: {RESPUESTA_GPT}")
+        # Almacenar las conversaciones
+        preguntas_anteriores.append(ingreso_usuario)
+        respuestas_anteriores.append(RESPUESTA_GPT)
+    else:
+        print("\n")
+        print("La respuesta no es relevante")
